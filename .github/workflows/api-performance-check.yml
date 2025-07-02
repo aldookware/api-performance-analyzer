@@ -1,0 +1,56 @@
+name: API Performance Analysis
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  performance-analysis:
+    runs-on: ubuntu-latest
+    name: Analyze API Performance
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run API Performance Analysis
+      uses: ./
+      id: analysis
+      with:
+        code_path: '.'
+        output_format: 'github'
+        severity_threshold: 'medium'
+        fail_on_issues: 'false'
+        
+    - name: Display Analysis Results
+      run: |
+        echo "Analysis completed with exit code: ${{ steps.analysis.outcome }}"
+        echo "Check the annotations above for detailed performance insights"
+
+  # Alternative job showing different configurations
+  strict-analysis:
+    runs-on: ubuntu-latest
+    name: Strict Performance Check
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run Strict Analysis (fails on issues)
+      uses: ./
+      with:
+        code_path: '.'
+        output_format: 'github'
+        severity_threshold: 'high'
+        fail_on_issues: 'true'
+      continue-on-error: true  # Don't fail the workflow, but mark step as failed
+        
+    - name: Generate Markdown Report
+      uses: ./
+      with:
+        code_path: '.'
+        output_format: 'markdown'
+        severity_threshold: 'low'
+        fail_on_issues: 'false'

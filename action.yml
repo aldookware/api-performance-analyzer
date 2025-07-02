@@ -1,0 +1,52 @@
+name: 'API Performance Analyzer'
+description: 'Analyze Go REST API code for performance bottlenecks, N+1 queries, and security issues before deployment'
+author: 'Aldo Okware'
+
+branding:
+  icon: 'zap'
+  color: 'yellow'
+
+inputs:
+  github-token:
+    description: 'GitHub token for API access'
+    required: true
+    default: ${{ github.token }}
+  code-path:
+    description: 'Path to Go code files to analyze (relative to repository root)'
+    required: false
+    default: '.'
+  output-format:
+    description: 'Output format: markdown, json, sarif, or github'
+    required: false
+    default: 'markdown'
+  fail-on-issues:
+    description: 'Fail the build if issues are found above severity threshold'
+    required: false
+    default: 'false'
+  severity-threshold:
+    description: 'Minimum severity to fail on: low, medium, high, critical'
+    required: false
+    default: 'high'
+  comment-pr:
+    description: 'Comment analysis results on pull requests'
+    required: false
+    default: 'true'
+
+outputs:
+  issues-found:
+    description: 'Number of performance and security issues found'
+  performance-score:
+    description: 'Overall performance score (0-100)'
+  files-analyzed:
+    description: 'Number of Go files analyzed'
+  analysis-results:
+    description: 'Full analysis results in JSON format'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.code-path }}
+    - ${{ inputs.output-format }}
+    - ${{ inputs.severity-threshold }}
+    - ${{ inputs.fail-on-issues }}

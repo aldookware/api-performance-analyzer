@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 AI Code Pattern Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+            min-height: 70vh;
+        }
+        
+        .code-input-section {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section-title {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        #codeInput {
+            width: 100%;
+            height: 400px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 14px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f8f9fa;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+        
+        #codeInput:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .analyze-button {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .analyze-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .analyze-button:active {
+            transform: translateY(0);
+        }
+        
+        .analyze-button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .results-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { color: rgba(0,0,0,0); text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0); }
+            40% { color: #7f8c8d; text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0); }
+            60% { text-shadow: .25em 0 0 #7f8c8d, .5em 0 0 rgba(0,0,0,0); }
+            80%, 100% { text-shadow: .25em 0 0 #7f8c8d, .5em 0 0 #7f8c8d; }
+        }
+        
+        .analysis-category {
+            margin-bottom: 25px;
+        }
+        
+        .category-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            color: white;
+        }
+        
+        .security-title { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
+        .performance-title { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); }
+        .practices-title { background: linear-gradient(135deg, #27ae60 0%, #229954 100%); }
+        .ai-title { background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); }
+        
+        .issue-card, .hint-card, .practice-card, .ai-card {
+            background: white;
+            margin: 10px 0;
+            padding: 18px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .issue-card:hover, .hint-card:hover, .practice-card:hover, .ai-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .issue-card { border-left-color: #e74c3c; }
+        .hint-card { border-left-color: #f39c12; }
+        .practice-card { border-left-color: #27ae60; }
+        .ai-card { border-left-color: #9b59b6; }
+        
+        .card-header {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        .card-severity {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: 10px;
+        }
+        
+        .severity-high { background: #ffebee; color: #c62828; }
+        .severity-medium { background: #fff3e0; color: #ef6c00; }
+        .severity-low { background: #f3e5f5; color: #7b1fa2; }
+        
+        .confidence-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            background: #e8f5e8;
+            color: #2e7d32;
+            margin-left: 10px;
+        }
+        
+        .card-content {
+            margin: 12px 0;
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+        
+        .suggestion, .solution, .reasoning {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border-left: 3px solid #3498db;
+            font-style: italic;
+        }
+        
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 13px;
+            margin-top: 10px;
+            border: 1px solid #34495e;
+        }
+        
+        .stats-bar {
+            background: #34495e;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 600;
+            display: block;
+        }
+        
+        .no-issues {
+            text-align: center;
+            padding: 40px;
+            color: #27ae60;
+            font-size: 1.2em;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            #codeInput {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Code Pattern Analyzer</h1>
+            <p>Intelligent analysis for Go REST APIs • Security • Performance • Best Practices</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="code-input-section">
+                <div class="section-title">📝 Paste Your Go Code</div>
+                <textarea id="codeInput" placeholder="Paste your Go REST API code here for AI analysis..."></textarea>
+                <button class="analyze-button" onclick="analyzeCode()">
+                    🔍 Analyze Code with AI
+                </button>
+            </div>
+            
+            <div class="results-section">
+                <div class="section-title">📊 Analysis Results</div>
+                <div id="results">
+                    <div style="text-align: center; padding: 40px; color: #7f8c8d;">
+                        <p>Paste your Go code and click "Analyze Code with AI" to get started!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-value" id="analysisCount">0</span>
+                <span>Analyses</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">4</span>
+                <span>Check Types</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">Go</span>
+                <span>Language</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">AI</span>
+                <span>Powered</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let analysisCount = 0;
+        
+        async function analyzeCode() {
+            const code = document.getElementById('codeInput').value;
+            const resultsDiv = document.getElementById('results');
+            const button = document.querySelector('.analyze-button');
+            
+            if (!code.trim()) {
+                resultsDiv.innerHTML = '<div style="text-align: center; padding: 40px; color: #e74c3c;"><p>⚠️ Please enter some code to analyze.</p></div>';
+                return;
+            }
+            
+            // Show loading state
+            button.disabled = true;
+            button.textContent = '🤖 AI is analyzing your code...';
+            resultsDiv.innerHTML = '<div class="loading">🤖 AI is analyzing your code</div>';
+            
+            try {
+                const response = await fetch('/api/v1/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code, type: 'gin' })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const analysis = await response.json();
+                displayResults(analysis);
+                
+                // Update stats
+                analysisCount++;
+                document.getElementById('analysisCount').textContent = analysisCount;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                resultsDiv.innerHTML = '<div style="text-align: center; padding: 40px; color: #e74c3c;"><p>❌ Error analyzing code. Please try again.</p></div>';
+            } finally {
+                button.disabled = false;
+                button.textContent = '🔍 Analyze Code with AI';
+            }
+        }
+        
+        function displayResults(analysis) {
+            const resultsDiv = document.getElementById('results');
+            let html = '';
+            
+            // Security Issues
+            if (analysis.security_issues && analysis.security_issues.length > 0) {
+                html += '<div class="analysis-category">';
+                html += '<div class="category-title security-title">🔒 Security Issues</div>';
+                analysis.security_issues.forEach(issue => {
+                    html += `<div class="issue-card">
+                        <div class="card-header">${issue.type.replace(/_/g, ' ').toUpperCase()}
+                            <span class="card-severity severity-${issue.severity}">${issue.severity}</span>
+                        </div>
+                        <div class="card-content">${issue.description}</div>
+                        <div class="suggestion">💡 ${issue.suggestion}</div>
+                    </div>`;
+                });
+                html += '</div>';
+            }
+            
+            // Performance Hints
+            if (analysis.performance_hints && analysis.performance_hints.length > 0) {
+                html += '<div class="analysis-category">';
+                html += '<div class="category-title performance-title">⚡ Performance Hints</div>';
+                analysis.performance_hints.forEach(hint => {
+                    html += `<div class="hint-card">
+                        <div class="card-header">${hint.issue}</div>
+                        <div class="card-content"><strong>Impact:</strong> ${hint.impact}</div>
+                        <div class="solution"><strong>Solution:</strong> ${hint.solution}</div>
+                        ${hint.code_example ? `<pre>${hint.code_example}</pre>` : ''}
+                    </div>`;
+                });
+                html += '</div>';
+            }
+            
+            // Best Practices
+            if (analysis.best_practices && analysis.best_practices.length > 0) {
+                html += '<div class="analysis-category">';
+                html += '<div class="category-title practices-title">✅ Best Practices</div>';
+                analysis.best_practices.forEach(practice => {
+                    html += `<div class="practice-card">
+                        <div class="card-header">${practice.category}</div>
+                        <div class="card-content">
+                            <strong>Current:</strong> ${practice.current}<br>
+                            <strong>Recommended:</strong> ${practice.recommended}
+                        </div>
+                        <div class="reasoning">${practice.reasoning}</div>
+                    </div>`;
+                });
+                html += '</div>';
+            }
+            
+            // AI Recommendations
+            if (analysis.ai_recommendations && analysis.ai_recommendations.length > 0) {
+                html += '<div class="analysis-category">';
+                html += '<div class="category-title ai-title">🤖 AI Recommendations</div>';
+                analysis.ai_recommendations.forEach(rec => {
+                    const confidence = Math.round(rec.confidence * 100);
+                    html += `<div class="ai-card">
+                        <div class="card-header">${rec.type.replace(/_/g, ' ').toUpperCase()}
+                            <span class="confidence-badge">${confidence}% confidence</span>
+                        </div>
+                        <div class="card-content">${rec.recommendation}</div>
+                        ${rec.auto_fix_code ? `<pre>${rec.auto_fix_code}</pre>` : ''}
+                    </div>`;
+                });
+                html += '</div>';
+            }
+            
+            if (!html) {
+                html = '<div class="no-issues">✅ Excellent! No issues found. Your code follows good practices!</div>';
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Load sample code on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('codeInput').value = `package main
+
+import (
+    "net/http"
+    "github.com/gin-gonic/gin"
+)
+
+type album struct {
+    ID     string  \`json:"id"\`
+    Title  string  \`json:"title"\`
+    Artist string  \`json:"artist"\`
+    Price  float64 \`json:"price"\`
+}
+
+var albums = []album{
+    {ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
+    {ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
+}
+
+func getAlbums(c *gin.Context) {
+    c.IndentedJSON(http.StatusOK, albums)
+}
+
+func postAlbums(c *gin.Context) {
+    var newAlbum album
+    if err := c.BindJSON(&newAlbum); err != nil {
+        return
+    }
+    albums = append(albums, newAlbum)
+    c.IndentedJSON(http.StatusCreated, newAlbum)
+}
+
+func main() {
+    router := gin.Default()
+    router.GET("/albums", getAlbums)
+    router.POST("/albums", postAlbums)
+    router.Run("localhost:8080")
+}`;
+        });
+    </script>
+</body>
+</html>

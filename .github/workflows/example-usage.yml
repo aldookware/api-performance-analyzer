@@ -1,0 +1,15 @@
+name: Quick API Performance Check
+
+on: [push, pull_request]
+
+jobs:
+  api-performance:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Analyze API Performance
+      uses: your-username/api-performance-analyzer@v1
+      with:
+        code_path: '.'
+        output_format: 'github'
+        severity_threshold: 'medium'
