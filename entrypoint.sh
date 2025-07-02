@@ -22,7 +22,7 @@ export INPUT_SEVERITY_THRESHOLD="$SEVERITY_THRESHOLD"
 export INPUT_FAIL_ON_ISSUES="$FAIL_ON_ISSUES"
 
 # Run the analyzer
-./analyzer \
+/root/analyzer \
   --path="$CODE_PATH" \
   --format="$OUTPUT_FORMAT" \
   --threshold="$SEVERITY_THRESHOLD" \

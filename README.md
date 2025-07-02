@@ -1,3 +1,4 @@
+
 # 🚀 API Performance Analyzer
 
 **Detect and fix API performance bottlenecks in Go REST APIs before they hit production**
@@ -47,10 +48,10 @@ jobs:
     - name: Analyze API Performance
       uses: aldookware/api-performance-analyzer@v1
       with:
-        code_path: '.'
-        output_format: 'github'
-        severity_threshold: 'medium'
-        fail_on_issues: 'true'
+        code-path: '.'
+        output-format: 'github'
+        severity-threshold: 'medium'
+        fail-on-issues: 'true'
 ```
 
 ### CLI Tool
@@ -126,10 +127,10 @@ Compatible with GitHub Security tab and other security tools.
 
 | Parameter | Description | Default | Options |
 |-----------|-------------|---------|---------|
-| `code_path` | Path to analyze | `.` | Any valid path |
-| `output_format` | Output format | `markdown` | `markdown`, `json`, `github`, `sarif` |
-| `severity_threshold` | Minimum severity | `medium` | `low`, `medium`, `high`, `critical` |
-| `fail_on_issues` | Fail CI on issues | `false` | `true`, `false` |
+| `code-path` | Path to analyze | `.` | Any valid path |
+| `output-format` | Output format | `markdown` | `markdown`, `json`, `github`, `sarif` |
+| `severity-threshold` | Minimum severity | `medium` | `low`, `medium`, `high`, `critical` |
+| `fail-on-issues` | Fail CI on issues | `false` | `true`, `false` |
 
 ### Example Configurations
 
@@ -137,25 +138,25 @@ Compatible with GitHub Security tab and other security tools.
 ```yaml
 - uses: aldookware/api-performance-analyzer@v1
   with:
-    severity_threshold: 'high'
-    fail_on_issues: 'true'
+    severity-threshold: 'high'
+    fail-on-issues: 'true'
 ```
 
 **Development Mode** (warnings only):
 ```yaml
 - uses: aldookware/api-performance-analyzer@v1
   with:
-    severity_threshold: 'low'
-    fail_on_issues: 'false'
-    output_format: 'markdown'
+    severity-threshold: 'low'
+    fail-on-issues: 'false'
+    output-format: 'markdown'
 ```
 
 **Security Focus** (JSON output for processing):
 ```yaml
 - uses: aldookware/api-performance-analyzer@v1
   with:
-    output_format: 'json'
-    severity_threshold: 'medium'
+    output-format: 'json'
+    severity-threshold: 'medium'
 ```
 
 ## 📈 Sample Analysis Results
