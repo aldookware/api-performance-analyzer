@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/your-username/api-performance-analyzer/internal/analysis"
+	"github.com/aldookware/api-performance-analyzer/internal/analysis"
 )
 
 type Config struct {

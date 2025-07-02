@@ -19,10 +19,10 @@ jobs:
       uses: ./
       id: analysis
       with:
-        code_path: '.'
-        output_format: 'github'
-        severity_threshold: 'medium'
-        fail_on_issues: 'false'
+        code-path: '.'
+        output-format: 'github'
+        severity-threshold: 'medium'
+        fail-on-issues: 'false'
         
     - name: Display Analysis Results
       run: |
