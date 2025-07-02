@@ -8,8 +8,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Analyze API Performance
-      uses: your-username/api-performance-analyzer@v1
+      uses: aldookware/api-performance-analyzer@v1
       with:
-        code_path: '.'
-        output_format: 'github'
-        severity_threshold: 'medium'
+        code-path: '.'
+        output-format: 'github'
+        severity-threshold: 'medium'

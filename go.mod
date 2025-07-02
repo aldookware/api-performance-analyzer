@@ -1,4 +1,4 @@
-module github.com/your-username/api-performance-analyzer
+module github.com/aldookware/api-performance-analyzer
 
 go 1.23.0
 

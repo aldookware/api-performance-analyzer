@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/your-username/api-performance-analyzer/internal/analysis"
+	"github.com/aldookware/api-performance-analyzer/internal/analysis"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
