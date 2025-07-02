@@ -253,6 +253,10 @@ func getSeverityEmoji(severity string) string {
 }
 
 func outputJSON(results []analysis.FileAnalysis) {
+	// Ensure we always output an array, even if empty
+	if results == nil {
+		results = []analysis.FileAnalysis{}
+	}
 	jsonData, _ := json.MarshalIndent(results, "", "  ")
 	fmt.Println(string(jsonData))
 }
