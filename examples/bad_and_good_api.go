@@ -48,7 +48,7 @@ func getUserOrders(c *gin.Context) {
 		}
 
 		// Each iteration triggers a separate query - N+1 problem!
-		db.Model(&order).Related(&order.User)
+		db.Model(&order).Association("User").Find(&order.User)
 		orders = append(orders, order)
 	}
 

@@ -145,19 +145,31 @@ func detectSecurityIssues(node *ast.File, fset *token.FileSet, code string) []Se
 }
 
 func detectPerformanceIssues(node *ast.File, fset *token.FileSet, code string) []PerformanceHint {
-	var hints []PerformanceHint
+	hints := make([]PerformanceHint, 0)
 
 	// 🔥 NEW: Detect N+1 Query Patterns - THE MONEY MAKER
-	hints = append(hints, detectN1QueryPatterns(node, fset, code)...)
+	n1Hints := detectN1QueryPatterns(node, fset, code)
+	if n1Hints != nil {
+		hints = append(hints, n1Hints...)
+	}
 
 	// 🔥 NEW: Detect Missing Database Indexes
-	hints = append(hints, detectMissingIndexes(node, fset, code)...)
+	indexHints := detectMissingIndexes(node, fset, code)
+	if indexHints != nil {
+		hints = append(hints, indexHints...)
+	}
 
 	// 🔥 NEW: Detect Large Payload Issues
-	hints = append(hints, detectLargePayloadIssues(node, fset, code)...)
+	payloadHints := detectLargePayloadIssues(node, fset, code)
+	if payloadHints != nil {
+		hints = append(hints, payloadHints...)
+	}
 
 	// 🔥 NEW: Detect Missing Caching Opportunities
-	hints = append(hints, detectMissingCaching(node, fset, code)...)
+	cacheHints := detectMissingCaching(node, fset, code)
+	if cacheHints != nil {
+		hints = append(hints, cacheHints...)
+	}
 
 	// Check for in-memory data storage
 	if strings.Contains(code, "var albums = []") || strings.Contains(code, "albums = append(") {
@@ -191,7 +203,7 @@ db.SetConnMaxLifetime(5 * time.Minute)`,
 
 // Detect N+1 Query Patterns - THE CRITICAL PERFORMANCE ISSUE
 func detectN1QueryPatterns(node *ast.File, fset *token.FileSet, code string) []PerformanceHint {
-	var hints []PerformanceHint
+	hints := make([]PerformanceHint, 0)
 
 	// Pattern 1: Loop with database calls
 	ast.Inspect(node, func(n ast.Node) bool {
@@ -286,7 +298,7 @@ db.Preload("Items").Find(&orders)`,
 
 // Detect queries that would benefit from database indexes
 func detectMissingIndexes(node *ast.File, fset *token.FileSet, code string) []PerformanceHint {
-	var hints []PerformanceHint
+	hints := make([]PerformanceHint, 0)
 
 	// Look for WHERE clauses on potentially unindexed columns
 	wherePatterns := []string{
@@ -326,7 +338,7 @@ type User struct {
 
 // Detect large payload serialization issues
 func detectLargePayloadIssues(node *ast.File, fset *token.FileSet, code string) []PerformanceHint {
-	var hints []PerformanceHint
+	hints := make([]PerformanceHint, 0)
 
 	// Look for JSON responses without pagination
 	if (strings.Contains(code, "c.JSON") || strings.Contains(code, "json.Marshal")) &&
@@ -366,7 +378,7 @@ c.JSON(200, gin.H{
 
 // Detect expensive operations that should be cached
 func detectMissingCaching(node *ast.File, fset *token.FileSet, code string) []PerformanceHint {
-	var hints []PerformanceHint
+	hints := make([]PerformanceHint, 0)
 
 	expensiveOperations := []string{
 		"calculateReport",
@@ -431,7 +443,7 @@ func isDBCall(callExpr *ast.CallExpr) bool {
 }
 
 func suggestBestPractices(node *ast.File, fset *token.FileSet, code string) []BestPractice {
-	var practices []BestPractice
+	practices := make([]BestPractice, 0)
 
 	practices = append(practices, BestPractice{
 		Category:    "Error Handling",
@@ -471,7 +483,7 @@ func suggestBestPractices(node *ast.File, fset *token.FileSet, code string) []Be
 }
 
 func generateAIRecommendations(code, codeType string) []AIRecommendation {
-	var recommendations []AIRecommendation
+	recommendations := make([]AIRecommendation, 0)
 
 	// Architecture recommendations
 	if strings.Contains(code, "func get") && strings.Contains(code, "func post") {
