@@ -26,14 +26,14 @@ func main() {
 			hasError: false,
 		},
 		{
-			name: "empty code",
-			code: "",
+			name:     "empty code",
+			code:     "",
 			filename: "empty.go",
 			hasError: false,
 		},
 		{
-			name: "invalid Go code",
-			code: "this is not valid Go code",
+			name:     "invalid Go code",
+			code:     "this is not valid Go code",
 			filename: "invalid.go",
 			hasError: true,
 		},
@@ -42,7 +42,7 @@ func main() {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := AnalyzeCode(tt.code, "go", tt.filename)
-			
+
 			// Check if syntax error is detected for invalid code
 			if tt.hasError {
 				found := false
@@ -56,7 +56,7 @@ func main() {
 					t.Error("Expected syntax error for invalid code")
 				}
 			}
-			
+
 			if result.FilePath != tt.filename {
 				t.Errorf("AnalyzeCode() FilePath = %v, want %v", result.FilePath, tt.filename)
 			}
@@ -137,10 +137,10 @@ func handler(c *gin.Context) {
 
 func TestAnalyzeCode_PerformanceScore(t *testing.T) {
 	tests := []struct {
-		name          string
-		code          string
-		minScore      int
-		maxScore      int
+		name     string
+		code     string
+		minScore int
+		maxScore int
 	}{
 		{
 			name: "clean code should have reasonable score",
@@ -171,9 +171,9 @@ func TestAnalyzeCode_Fields(t *testing.T) {
 	code := `package main
 import "fmt"
 func main() { fmt.Println("test") }`
-	
+
 	result := AnalyzeCode(code, "go", "test.go")
-	
+
 	// Test that all fields are initialized (should be empty slices, not nil)
 	if result.SecurityIssues == nil {
 		t.Error("SecurityIssues should not be nil")
@@ -258,9 +258,9 @@ func addAlbum(album Album) {
 
 func TestAnalyzeCode_BestPracticesDetection(t *testing.T) {
 	tests := []struct {
-		name               string
-		code               string
-		expectedPractices  []string
+		name              string
+		code              string
+		expectedPractices []string
 	}{
 		{
 			name: "missing middleware",
@@ -336,8 +336,8 @@ func postAlbums(c *gin.Context) { }`
 
 func TestAnalyzeCode_ComplexityCalculation(t *testing.T) {
 	tests := []struct {
-		name        string
-		code        string
+		name          string
+		code          string
 		minComplexity int
 		maxComplexity int
 	}{
@@ -470,7 +470,7 @@ func BenchmarkAnalyzeCode_MediumFile(b *testing.B) {
 	var codeBuilder strings.Builder
 	codeBuilder.WriteString("package main\n\n")
 	codeBuilder.WriteString("import \"fmt\"\n\n")
-	
+
 	for i := 0; i < 10; i++ {
 		codeBuilder.WriteString(fmt.Sprintf(`
 func function%d() {

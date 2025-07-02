@@ -40,3 +40,6 @@ Thumbs.db
 # Build artifacts
 dist/
 build/
+
+# Documentation files
+ARCHITECTURE.md

@@ -35,7 +35,7 @@ jobs:
       run: go tool cover -html=coverage.out -o coverage.html
       
     - name: Upload coverage to artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-report
         path: coverage.html
@@ -165,31 +165,72 @@ jobs:
         }
         EOF
         
-    - name: Test analyzer on problematic code
-      uses: ./
-      with:
-        code-path: './test-project'
-        output-format: 'json'
-        severity-threshold: 'low'
-        fail-on-issues: 'false'
+    - name: Build Docker image for testing
+      run: docker build -t api-analyzer-integration .
         
-    - name: Verify issues were detected
+    - name: Test analyzer on problematic code
       run: |
         # Run analyzer and save output
         docker run --rm -v "$(pwd):/workspace" \
-          $(docker build -q .) \
+          api-analyzer-integration \
           /workspace/test-project json low false > test-results.json
         
         echo "Analysis results:"
         cat test-results.json
         
-        # Check that some issues were found
-        ISSUES_COUNT=$(jq '.files | length' test-results.json)
-        echo "Found analysis for $ISSUES_COUNT files"
+    - name: Verify issues were detected
+      run: |
+        # Install jq for JSON parsing
+        sudo apt-get update && sudo apt-get install -y jq
         
-        if [ "$ISSUES_COUNT" -eq 0 ]; then
+        # Check if the output file exists and has content
+        if [ ! -s test-results.json ]; then
+          echo "❌ No analysis output generated or file is empty"
+          echo "File size: $(wc -c < test-results.json 2>/dev/null || echo '0') bytes"
+          exit 1
+        fi
+        
+        echo "✅ Analysis output file generated ($(wc -c < test-results.json) bytes)"
+        
+        # Check if the JSON is valid
+        if ! jq empty test-results.json 2>/dev/null; then
+          echo "❌ Invalid JSON output"
+          echo "First 500 characters of output:"
+          head -c 500 test-results.json
+          exit 1
+        fi
+        
+        echo "✅ Valid JSON output confirmed"
+        
+        # Check the structure - should be an array of file analysis results
+        RESULT_TYPE=$(jq -r 'type' test-results.json)
+        if [ "$RESULT_TYPE" != "array" ]; then
+          echo "❌ Expected JSON array, got: $RESULT_TYPE"
+          exit 1
+        fi
+        
+        # Count analyzed files
+        FILES_COUNT=$(jq 'length' test-results.json)
+        echo "📊 Files analyzed: $FILES_COUNT"
+        
+        if [ "$FILES_COUNT" -eq 0 ]; then
           echo "❌ No files were analyzed"
           exit 1
+        fi
+        
+        # Count issues found
+        SECURITY_ISSUES=$(jq '[.[] | .analysis.security_issues | length] | add' test-results.json)
+        PERFORMANCE_ISSUES=$(jq '[.[] | .analysis.performance_hints | length] | add' test-results.json)
+        
+        echo "🔒 Security issues found: $SECURITY_ISSUES"
+        echo "⚡ Performance issues found: $PERFORMANCE_ISSUES"
+        
+        # Verify we found at least some issues in the problematic test code
+        TOTAL_ISSUES=$((SECURITY_ISSUES + PERFORMANCE_ISSUES))
+        if [ "$TOTAL_ISSUES" -gt 0 ]; then
+          echo "✅ Successfully detected $TOTAL_ISSUES issues in test code"
         else
-          echo "✅ Files were successfully analyzed"
+          echo "⚠️  No issues detected - this might be unexpected for problematic test code"
+          echo "🔍 Sample file analysis:"
+          jq -r '.[0] | .file_path + " - Security: " + (.analysis.security_issues | length | tostring) + ", Performance: " + (.analysis.performance_hints | length | tostring)' test-results.json
         fi
