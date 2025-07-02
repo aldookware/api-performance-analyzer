@@ -3,7 +3,7 @@
 **Detect and fix API performance bottlenecks in Go REST APIs before they hit production**
 
 [![GitHub Marketplace](https://img.shields.io/badge/GitHub-Marketplace-blue?logo=github)](https://github.com/marketplace/actions/api-performance-analyzer)
-[![Docker](https://img.shields.io/badge/Docker-Available-blue?logo=docker)](https://hub.docker.com/r/your-username/api-performance-analyzer)
+[![Docker](https://img.shields.io/badge/Docker-Available-blue?logo=docker)](https://hub.docker.com/r/aldookware/api-performance-analyzer)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > Transform your Go APIs into high-performance, production-ready services with automated performance analysis and actionable recommendations.
@@ -45,7 +45,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Analyze API Performance
-      uses: your-username/api-performance-analyzer@v1
+      uses: aldookware/api-performance-analyzer@v1
       with:
         code_path: '.'
         output_format: 'github'
@@ -57,7 +57,7 @@ jobs:
 
 ```bash
 # Download and run locally
-go install github.com/your-username/api-performance-analyzer/cmd/analyzer@latest
+go install github.com/aldookware/api-performance-analyzer/cmd/analyzer@latest
 
 # Analyze your codebase
 analyzer --path=. --format=markdown --verbose
@@ -71,7 +71,7 @@ analyzer --path=./src --format=json --threshold=high
 ```bash
 # Pull and run
 docker run --rm -v "$(pwd):/workspace" \
-  your-username/api-performance-analyzer:latest \
+  aldookware/api-performance-analyzer:latest \
   /workspace markdown medium false
 
 # Build from source
@@ -135,7 +135,7 @@ Compatible with GitHub Security tab and other security tools.
 
 **Strict Mode** (fails on any high+ issues):
 ```yaml
-- uses: your-username/api-performance-analyzer@v1
+- uses: aldookware/api-performance-analyzer@v1
   with:
     severity_threshold: 'high'
     fail_on_issues: 'true'
@@ -143,7 +143,7 @@ Compatible with GitHub Security tab and other security tools.
 
 **Development Mode** (warnings only):
 ```yaml
-- uses: your-username/api-performance-analyzer@v1
+- uses: aldookware/api-performance-analyzer@v1
   with:
     severity_threshold: 'low'
     fail_on_issues: 'false'
@@ -152,7 +152,7 @@ Compatible with GitHub Security tab and other security tools.
 
 **Security Focus** (JSON output for processing):
 ```yaml
-- uses: your-username/api-performance-analyzer@v1
+- uses: aldookware/api-performance-analyzer@v1
   with:
     output_format: 'json'
     severity_threshold: 'medium'
@@ -243,7 +243,7 @@ sonar-scanner -Dsonar.go.coverage.reportPaths=results.sarif
 ### Building from Source
 ```bash
 # Clone repository
-git clone https://github.com/your-username/api-performance-analyzer
+git clone https://github.com/aldookware/api-performance-analyzer
 cd api-performance-analyzer
 
 # Build CLI
@@ -302,9 +302,9 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md).
 5. Submit a pull request
 
 ### Reporting Issues
-- 🐛 [Bug Report](https://github.com/your-username/api-performance-analyzer/issues/new?template=bug_report.md)
-- ✨ [Feature Request](https://github.com/your-username/api-performance-analyzer/issues/new?template=feature_request.md)
-- � [Documentation Issue](https://github.com/your-username/api-performance-analyzer/issues/new?template=docs.md)
+- 🐛 [Bug Report](https://github.com/aldookware/api-performance-analyzer/issues/new?template=bug_report.md)
+- ✨ [Feature Request](https://github.com/aldookware/api-performance-analyzer/issues/new?template=feature_request.md)
+- 📚 [Documentation Issue](https://github.com/aldookware/api-performance-analyzer/issues/new?template=docs.md)
 
 ## 📄 License
 
